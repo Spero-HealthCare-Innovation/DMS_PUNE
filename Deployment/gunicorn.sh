@@ -52,7 +52,9 @@ fi
 # Show user and current directory
 echo "Current User: $USER"
 echo "Current Directory: $PWD"
- 
+
+sudo chown -R www-data:www-data /var/www/html/DMS_project/DMS_PUNE/Deployment/logs
+
 # Reload systemd and restart Gunicorn
 sudo systemctl daemon-reload
 sudo systemctl restart dms_gunicorn_django
