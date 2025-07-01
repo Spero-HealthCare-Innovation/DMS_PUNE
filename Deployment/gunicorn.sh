@@ -53,10 +53,9 @@ fi
 echo "Current User: $USER"
 echo "Current Directory: $PWD"
 
-sudo chown -R www-data:www-data /var/www/html/DMS_project/DMS_PUNE/Deployment/logs
-sudo chmod 755 /var/www/html/DMS_project/DMS_PUNE/Deployment/logs
-sudo chmod 644 /var/www/html/DMS_project/DMS_PUNE/Deployment/logs/*.log
 sudo chown -R jenkins:jenkins /var/www/html/DMS_project/DMS_PUNE/Deployment/logs
+sudo chmod 644 /var/www/html/DMS_project/DMS_PUNE/Deployment/logs/*.log
+
 # Reload systemd and restart Gunicorn
 sudo systemctl daemon-reload
 sudo systemctl restart dms_gunicorn_django
