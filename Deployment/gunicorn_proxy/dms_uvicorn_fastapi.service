@@ -6,13 +6,11 @@ After=network.target
 User=www-data
 Group=www-data
 WorkingDirectory=/var/www/html/DMS_project/DMS_PUNE/DMS_goa/DMS_fastapi_service
-
 ExecStart=/var/www/html/DMS_project/DMS_PUNE/vvenv/bin/uvicorn main:app \
     --host 127.0.0.1 \
     --port 9000 \
     --proxy-headers \
     --forwarded-allow-ips '*'
-
 Environment="PYTHONPATH=/var/www/html/DMS_project/DMS_PUNE/DMS_goa/DMS_fastapi_service"
 Restart=always
 RestartSec=5
