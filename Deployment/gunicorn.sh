@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PJ_BASE_PATH="/var/www/html/DMS_goa/Deployment"
+PJ_BASE_PATH="/var/www/html/DMS_project/DMS_PUNE/Deployment"
 # Activate virtual environment
 echo "Runining gunicorn sh file"
 pwd
@@ -15,7 +15,7 @@ if [ -d "vvenv" ]; then
 else
     python3 -m venv vvenv
     echo "Current Directory: $PWD"
-    # pip install -r requirnment.txt
+    pip install -r requirnment.txt
 fi
 
 echo "pip freeze in gunicorn.sh"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PJ_BASE_PATH="/var/www/html/DMS_goa/Deployment"
+PJ_BASE_PATH="/var/www/html/DMS_project/DMS_PUNE/Deployment"
 VENV_PATH="./vvenv"
 FASTAPI_SERVICE="/etc/systemd/system/dms_uvicorn_fastapi.service"
 NGINX_CONF="/etc/nginx/sites-available/dms_goa_fastapi_7777.conf"
@@ -19,7 +19,7 @@ fi
 
 # Activate venv and install dependencies
 source "$VENV_PATH/bin/activate"
-pip install -r "/var/www/html/DMS_goa/requirnment.txt"
+pip install -r "/var/www/html/DMS_project/DMS_PUNE/requirnment.txt"
 
 # Remove stale socket if it exists
 if [ -S "$SOCKET_FILE" ]; then
