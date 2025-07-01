@@ -45,9 +45,7 @@ pipeline {
                             echo "Cloning repository into ${TARGET_DIR}..."
                             sh """
                                 git clone -b ${GIT_BRANCH} ${GIT_REPO_URL} .
-                                sudo chown -R jenkins:jenkins /var/www/html/DMS_project/DMS_PUNE/Deployment/logs/
-                                sudo chown -R jenkins:jenkins /var/www/html/DMS_project/DMS_PUNE/logs/
-
+                               
                             """
                         } else {
                             echo "Repository already exists. Pulling latest changes..."
@@ -56,8 +54,7 @@ pipeline {
                                 git fetch origin ${GIT_BRANCH}
                                 git reset --hard origin/${GIT_BRANCH}
                                 git clean -fd -e vvenv/
-                                sudo chown -R jenkins:jenkins /var/www/html/DMS_project/DMS_PUNE/Deployment/logs/
-                                sudo chown -R jenkins:jenkins /var/www/html/DMS_project/DMS_PUNE/logs/
+                               
 
                             """
                         }

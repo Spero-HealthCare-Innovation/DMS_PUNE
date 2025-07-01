@@ -40,18 +40,18 @@ sudo nginx -t && {
 # sudo systemctl status dms_gunicorn_django
 
 # Log permissions
-echo "[~] Setting permissions on logs folder..."
-sudo chown -R :dmsgroup "$LOG_PATH"
-sudo chmod -R 775 "$LOG_PATH"
-sudo chown :dmsgroup "$LOG_PATH/django_logentry.log"
-sudo chmod 664 "$LOG_PATH/django_logentry.log"
+# echo "[~] Setting permissions on logs folder..."
+# sudo chown -R :dmsgroup "$LOG_PATH"
+# sudo chmod -R 775 "$LOG_PATH"
+# sudo chown :dmsgroup "$LOG_PATH/django_logentry.log"
+# sudo chmod 664 "$LOG_PATH/django_logentry.log"
 
 
 # Permissions for log
-sudo chown www-data:www-data /var/www/html/DMS_project/DMS_PUNE/logs/django_logentry.log
-sudo chmod 664 /var/www/html/DMS_project/DMS_PUNE/logs/django_logentry.log
-sudo chown -R www-data:www-data /var/www/html/DMS_project/DMS_PUNE/logs/
-sudo chmod -R 775 /var/www/html/DMS_project/DMS_PUNE/logs/
+# sudo chown www-data:www-data /var/www/html/DMS_project/DMS_PUNE/logs/django_logentry.log
+# sudo chmod 664 /var/www/html/DMS_project/DMS_PUNE/logs/django_logentry.log
+# sudo chown -R www-data:www-data /var/www/html/DMS_project/DMS_PUNE/logs/
+# sudo chmod -R 775 /var/www/html/DMS_project/DMS_PUNE/logs/
 sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl restart dms_uvicorn_fastapi

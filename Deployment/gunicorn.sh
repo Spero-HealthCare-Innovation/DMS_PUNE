@@ -53,7 +53,7 @@ fi
 echo "Current User: $USER"
 echo "Current Directory: $PWD"
 
-sudo chown -R www-data:www-data /var/www/html/DMS_project/DMS_PUNE/Deployment/logs
+# sudo chown -R www-data:www-data /var/www/html/DMS_project/DMS_PUNE/Deployment/logs
 
 # Reload systemd and restart Gunicorn
 sudo systemctl daemon-reload
