@@ -9,7 +9,6 @@ urlpatterns = [
     path('department_put/<int:dep_id>/',DMS_department_put_api.as_view(),name='department_put'),
     path('department_delete/<int:dep_id>/',DMS_department_delete_api.as_view(),name='department_delete'),
 
-
     path('group_post/',DMS_Group_post_api.as_view(),name='group_post'),
     path('group_put/<int:grp_id>/',DMS_Group_put_api.as_view(),name='group_put'),
     path('group_delete/<int:grp_id>/',DMS_Group_delete_api.as_view(),name='group_delete'),

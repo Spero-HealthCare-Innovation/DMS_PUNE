@@ -74,7 +74,6 @@ def download_incident_report_incident_daywise(
         output = BytesIO()
         wb.save(output)
         output.seek(0)
-
         filename = f"incident_report_{from_date}_to_{to_date}.xlsx"
         headers = {'Content-Disposition': f'attachment; filename="{filename}"'}
         return StreamingResponse(output,media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',headers=headers)

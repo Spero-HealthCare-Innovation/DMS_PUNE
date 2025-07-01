@@ -145,7 +145,7 @@ class DMS_Group_Serializer(serializers.ModelSerializer):
     dep_name = serializers.CharField(source='dep_id.dep_name', read_only=True)
     class Meta:
         model = DMS_Group
-        fields = ['grp_id','grp_code','permission_status','grp_name','grp_is_deleted','grp_added_date','grp_added_by','grp_modified_date','grp_modified_by','dep_id','dep_name']
+        fields = '__all__'
         
 class DMS_Department_Serializer(serializers.ModelSerializer):
     dst_name = serializers.CharField(source='dis_id.dis_name', read_only=True)
@@ -318,13 +318,6 @@ class Comments_Serializer(serializers.ModelSerializer):
         model = DMS_Comments
         fields = '__all__' 
         
-
-class Weather_alerts_Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = Weather_alerts
-        fields = ['pk_id']
-        
-
 class Sop_Response_Procedure_Serializer(serializers.ModelSerializer):
     class Meta:
         model = DMS_SOP

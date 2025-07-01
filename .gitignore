@@ -7216,3 +7216,5 @@ vvenv/Scripts/sqlformat.exe
 DMS_client/node_modules/
 /demo.py
 /myenv
+DMS_goa/DMS_MDT/migrations/
+DMS_goa/media_files/
