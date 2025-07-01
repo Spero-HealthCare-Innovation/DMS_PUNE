@@ -32,7 +32,7 @@ SECRET_KEY = 'django-insecure-8(5d-gneh@!wgfto_an0d!*-*6)pc#$5^9^q6wi4&i2upr$=^c
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['122.176.232.35','192.168.1.116','127.0.0.1','192.168.1.133']
+ALLOWED_HOSTS = ['122.176.232.35','192.168.1.202','127.0.0.1','192.168.1.133']
 
 
 # Application definition
@@ -91,7 +91,7 @@ WSGI_APPLICATION = 'DMS_goa.wsgi.application'
 DATABASES = {
        'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'DMS_GOA_DB_2025',
+        'NAME': 'DMS_DEMO_server_202_DB',
         'USER': 'postgres',
         'PASSWORD': 'spero@123#2025$', 
         'HOST': '122.176.232.35',
@@ -199,17 +199,16 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:5175",
-    "http://192.168.1.116:7000",
-    "http://192.168.1.116:6003",
-    "http://192.168.1.116:7777",
-    "http://192.168.1.116:9000",
-    "http://122.176.232.35:7000",
+    "http://192.168.1.202:7000",
+    "http://192.168.1.202:6003",
+    "http://192.168.1.202:7777",
+    "http://192.168.1.202:9000",
     "http://210.212.165.119",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://192.168.1.116:6003",
-    "http://122.176.232.35:6003",
+    "http://192.168.1.202:6003",
+    # "http://122.176.232.35:6003",
 
 ]
 
