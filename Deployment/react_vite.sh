@@ -18,7 +18,9 @@ else
 fi
 
 # Run npm install and build (avoid sudo inside Jenkins)
+echo "npm i"
 npm install || { echo "React npm installation failed"; exit 1; }
+echo "npm run build"
 npm run build || { echo "React build failed"; exit 1; }
 
 echo "React Build Created"
