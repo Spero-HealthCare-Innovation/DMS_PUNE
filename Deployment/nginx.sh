@@ -1,7 +1,7 @@
 #!/bin/bash
 
-NGINX_CONF_PATH="/var/www/html/DMS_goa/Deployment/nginx_proxy"
-LOG_PATH="/var/www/html/DMS_goa/logs"
+NGINX_CONF_PATH="/var/www/html/DMS_project/DMS_PUNE/Deployment/nginx_proxy"
+LOG_PATH="/var/www/html/DMS_project/DMS_PUNE/logs"
 
 echo "========= Starting NGINX Configuration ========="
 
@@ -48,10 +48,10 @@ sudo chmod 664 "$LOG_PATH/django_logentry.log"
 
 
 # Permissions for log
-sudo chown www-data:www-data /var/www/html/DMS_goa/logs/django_logentry.log
-sudo chmod 664 /var/www/html/DMS_goa/logs/django_logentry.log
-sudo chown -R www-data:www-data /var/www/html/DMS_goa/logs/
-sudo chmod -R 775 /var/www/html/DMS_goa/logs/
+sudo chown www-data:www-data /var/www/html/DMS_project/DMS_PUNE/logs/django_logentry.log
+sudo chmod 664 /var/www/html/DMS_project/DMS_PUNE/logs/django_logentry.log
+sudo chown -R www-data:www-data /var/www/html/DMS_project/DMS_PUNE/logs/
+sudo chmod -R 775 /var/www/html/DMS_project/DMS_PUNE/logs/
 sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl restart dms_uvicorn_fastapi
