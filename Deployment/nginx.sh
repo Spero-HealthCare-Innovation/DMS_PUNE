@@ -35,23 +35,8 @@ sudo nginx -t && {
     echo "[✗] NGINX config test failed. Please check errors above."
 }
 
-# Restart FastAPI and check Django status
-# sudo systemctl restart dms_uvicorn_fastapi
-# sudo systemctl status dms_gunicorn_django
-
-# Log permissions
-# echo "[~] Setting permissions on logs folder..."
-# sudo chown -R :dmsgroup "$LOG_PATH"
-# sudo chmod -R 775 "$LOG_PATH"
-# sudo chown :dmsgroup "$LOG_PATH/django_logentry.log"
-# sudo chmod 664 "$LOG_PATH/django_logentry.log"
-
-
-# Permissions for log
-# sudo chown www-data:www-data /var/www/html/DMS_project/DMS_PUNE/logs/django_logentry.log
-# sudo chmod 664 /var/www/html/DMS_project/DMS_PUNE/logs/django_logentry.log
-# sudo chown -R www-data:www-data /var/www/html/DMS_project/DMS_PUNE/logs/
-# sudo chmod -R 775 /var/www/html/DMS_project/DMS_PUNE/logs/
+sudo chmod 664 /var/www/html/DMS_project/DMS_PUNE/logs/django_logentry.log 
+sudo chown jenkins:www-data /var/www/html/DMS_project/DMS_PUNE/logs/django_logentry.log   
 
 sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
