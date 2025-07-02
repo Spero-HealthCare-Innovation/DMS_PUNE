@@ -12,7 +12,7 @@ ExecStart=/var/www/html/DMS_project/DMS_PUNE/vvenv/bin/gunicorn \
         --access-logfile /var/www/html/DMS_project/DMS_PUNE/Deployment/logs/access.log \
         --workers 3 \
         --capture-output --log-level debug \
-        --bind unix:/run/dms_gunicorn.sock \
+        --bind unix:/run/dms_gunicorn_django.sock \
         DMS_goa.wsgi:application
 
 [Install]
