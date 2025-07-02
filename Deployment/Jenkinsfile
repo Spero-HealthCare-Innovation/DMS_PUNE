@@ -5,18 +5,12 @@ pipeline {
         skipDefaultCheckout(true)
     }
 
-    // Add permissions to project
-    // sudo groupadd dmsgroup
-    // sudo usermod -aG dmsgroup spero_cad25
-    // sudo usermod -aG dmsgroup jenkins
-    // sudo chown -R :dmsgroup /var/www/html/DMS_goa
-    // sudo chmod -R 775 /var/www/html/DMS_goa/
-    // restart server
 
     environment {
         GIT_REPO_URL = 'https://github.com/Spero-HealthCare-Innovation/DMS_PUNE.git'
         GIT_BRANCH = 'main'
         TARGET_DIR = '/var/www/html/DMS_project/DMS_PUNE'
+        PGPASSWORD = 'spero@123#2025$'
     } 
 
     stages {
@@ -62,6 +56,45 @@ pipeline {
                 }
             }
         }
+
+        stage('Archive Code Snapshot') {
+            steps {
+                script {
+                    def timestamp = sh(script: "date +%Y-%m-%d_%H-%M-%S", returnStdout: true).trim()
+                    def backupDir = "/var/www/html/DMS_project/DMS_backups/DMS_PUNE_${timestamp}"
+                    sh """
+                        echo "Creating backup at ${backupDir}"
+                        mkdir -p ${backupDir}
+                        cp -r ${TARGET_DIR}/* ${backupDir}/
+                        echo "Backup created successfully"
+                    """
+                }
+            }
+        }
+        stage('Backup PostgreSQL Database') {
+            environment {
+                PGHOST = '122.176.232.35'
+                PGPORT = '5433'
+                PGUSER = 'postgres'
+                PGDATABASE = 'DMS_GOA_DB_2025'
+                BACKUP_DIR = '/var/www/html/DMS_project/db_backups'
+            }
+            steps {
+                withCredentials([string(credentialsId: 'PG_DB_PASSWORD', variable: 'PGPASSWORD')]) {
+                    script {
+                        def timestamp = sh(script: "date +%Y-%m-%d_%H-%M-%S", returnStdout: true).trim()
+                        def backupFile = "${BACKUP_DIR}/${PGDATABASE}_backup_${timestamp}.sql"
+                        sh """
+                            mkdir -p ${BACKUP_DIR}
+                            export PGPASSWORD=${PGPASSWORD}
+                            pg_dump -h ${PGHOST} -p ${PGPORT} -U ${PGUSER} -F p -d ${PGDATABASE} -f ${backupFile}
+                            echo "Database backup completed at ${backupFile}"
+                        """
+                    }
+                }
+            }
+        }
+
 
         stage('Fix Permissions') {
             steps {
