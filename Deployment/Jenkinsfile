@@ -85,7 +85,7 @@ pipeline {
                     script {
                         def timestamp = sh(script: "date +%Y-%m-%d_%H-%M-%S", returnStdout: true).trim()
                         def backupFile = "${BACKUP_DIR}/${PGDATABASE}_backup_${timestamp}.sql"
-                        sh """
+                        sh '''
                             echo "=== Starting DB backup at: $(date) ==="
                             echo "Host: ${PGHOST}"
                             echo "Port: ${PGPORT}"
@@ -106,7 +106,7 @@ pipeline {
                             else
                                 echo "✅ Database backup completed at ${backupFile}"
                             fi
-                        """
+                        '''
                     }
                 }
             }
