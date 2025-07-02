@@ -53,8 +53,15 @@ fi
 echo "Current User: $USER"
 echo "Current Directory: $PWD"
 
-sudo chown -R jenkins:jenkins /var/www/html/DMS_project/DMS_PUNE/Deployment/logs
-sudo chmod 644 /var/www/html/DMS_project/DMS_PUNE/Deployment/logs/*.log
+
+sudo chown -R jenkins:www-data /var/www/html/DMS_project/DMS_PUNE/Deployment/logs
+sudo chmod -R 755 /var/www/html/DMS_project/DMS_PUNE/Deployment/logs
+sudo chmod o+x /var/www
+sudo chmod o+x /var/www/html
+sudo chmod o+x /var/www/html/DMS_project
+sudo chmod o+x /var/www/html/DMS_project/DMS_PUNE
+sudo chmod o+x /var/www/html/DMS_project/DMS_PUNE/Deployment
+
 
 # Reload systemd and restart Gunicorn
 sudo systemctl daemon-reload
