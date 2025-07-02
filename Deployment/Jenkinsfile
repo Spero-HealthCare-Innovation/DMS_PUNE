@@ -81,36 +81,37 @@ pipeline {
                 PGPASSWORD = 'spero@123#2025$'
             }
             steps {
-                withCredentials([string(credentialsId: 'PG_DB_PASSWORD', variable: 'PGPASSWORD')]) {
-                    script {
-                        def timestamp = sh(script: "date +%Y-%m-%d_%H-%M-%S", returnStdout: true).trim()
-                        def backupFile = "${BACKUP_DIR}/${PGDATABASE}_backup_${timestamp}.sql"
-                        sh '''
-                            echo "=== Starting DB backup at: $(date) ==="
-                            echo "Host: ${PGHOST}"
-                            echo "Port: ${PGPORT}"
-                            echo "User: ${PGUSER}"
-                            echo "Database: ${PGDATABASE}"
-                            echo "Backup file: ${backupFile}"
-                            
-                            mkdir -p ${BACKUP_DIR}
-                            export PGPASSWORD='${PGPASSWORD}'
-                            
-                            pg_dump -h ${PGHOST} -p ${PGPORT} -U ${PGUSER} -F p -d ${PGDATABASE} -f ${backupFile} 2> ${BACKUP_DIR}/backup_error_${timestamp}.log
+                script {
+                    def timestamp = sh(script: "date +%Y-%m-%d_%H-%M-%S", returnStdout: true).trim()
+                    def backupFile = "${BACKUP_DIR}/${PGDATABASE}_backup_${timestamp}.sql"
+                    def errorFile = "${BACKUP_DIR}/backup_error_${timestamp}.log"
 
-                            BACKUP_STATUS=$?
-                            if [ $BACKUP_STATUS -ne 0 ]; then
-                                echo "❌ pg_dump failed. See error log:"
-                                cat ${BACKUP_DIR}/backup_error_${timestamp}.log
-                                exit 1
-                            else
-                                echo "✅ Database backup completed at ${backupFile}"
-                            fi
-                        '''
-                    }
+                    sh """
+                        echo "=== Starting DB backup at: \$(date) ==="
+                        echo "Host: ${PGHOST}"
+                        echo "Port: ${PGPORT}"
+                        echo "User: ${PGUSER}"
+                        echo "Database: ${PGDATABASE}"
+                        echo "Backup file: ${backupFile}"
+                        
+                        mkdir -p ${BACKUP_DIR}
+                        export PGPASSWORD='${PGPASSWORD}'
+                        
+                        pg_dump -h ${PGHOST} -p ${PGPORT} -U ${PGUSER} -F p -d ${PGDATABASE} -f ${backupFile} 2> ${errorFile}
+                        
+                        BACKUP_STATUS=\$?
+                        if [ \$BACKUP_STATUS -ne 0 ]; then
+                            echo "❌ pg_dump failed. See error log:"
+                            cat ${errorFile}
+                            exit 1
+                        else
+                            echo "✅ Database backup completed at ${backupFile}"
+                        fi
+                    """
                 }
             }
         }
+
 
 
 
