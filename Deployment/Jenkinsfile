@@ -10,7 +10,7 @@ pipeline {
         GIT_REPO_URL = 'https://github.com/Spero-HealthCare-Innovation/DMS_PUNE.git'
         GIT_BRANCH = 'main'
         TARGET_DIR = '/var/www/html/DMS_project/DMS_PUNE'
-        PGPASSWORD = 'spero@123#2025$'
+        
     } 
 
     stages {
@@ -78,6 +78,7 @@ pipeline {
                 PGUSER = 'postgres'
                 PGDATABASE = 'DMS_GOA_DB_2025'
                 BACKUP_DIR = '/var/www/html/DMS_project/db_backups'
+                PGPASSWORD = 'spero@123#2025$'
             }
             steps {
                 withCredentials([string(credentialsId: 'PG_DB_PASSWORD', variable: 'PGPASSWORD')]) {
@@ -85,15 +86,32 @@ pipeline {
                         def timestamp = sh(script: "date +%Y-%m-%d_%H-%M-%S", returnStdout: true).trim()
                         def backupFile = "${BACKUP_DIR}/${PGDATABASE}_backup_${timestamp}.sql"
                         sh """
+                            echo "=== Starting DB backup at: $(date) ==="
+                            echo "Host: ${PGHOST}"
+                            echo "Port: ${PGPORT}"
+                            echo "User: ${PGUSER}"
+                            echo "Database: ${PGDATABASE}"
+                            echo "Backup file: ${backupFile}"
+                            
                             mkdir -p ${BACKUP_DIR}
-                            export PGPASSWORD=${PGPASSWORD}
-                            pg_dump -h ${PGHOST} -p ${PGPORT} -U ${PGUSER} -F p -d ${PGDATABASE} -f ${backupFile}
-                            echo "Database backup completed at ${backupFile}"
+                            export PGPASSWORD='${PGPASSWORD}'
+                            
+                            pg_dump -h ${PGHOST} -p ${PGPORT} -U ${PGUSER} -F p -d ${PGDATABASE} -f ${backupFile} 2> ${BACKUP_DIR}/backup_error_${timestamp}.log
+
+                            BACKUP_STATUS=$?
+                            if [ $BACKUP_STATUS -ne 0 ]; then
+                                echo "❌ pg_dump failed. See error log:"
+                                cat ${BACKUP_DIR}/backup_error_${timestamp}.log
+                                exit 1
+                            else
+                                echo "✅ Database backup completed at ${backupFile}"
+                            fi
                         """
                     }
                 }
             }
         }
+
 
 
         stage('Fix Permissions') {
