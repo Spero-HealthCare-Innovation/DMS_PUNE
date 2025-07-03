@@ -269,8 +269,8 @@ const CaseClosureDetails = ({
       incident_id: incidentId,
       inc_id: numericIncId,
       // responder: selectedDepartments.length > 0 ? selectedDepartments[0] : "", 
-      responder: selectedDepartments, 
-      closure_responder_name: formData.responderName || "", 
+      responder: selectedDepartments,
+      closure_responder_name: formData.responderName || "",
       vehicle_no: formData.vehicleNumber,
       closure_acknowledge: formData.acknowledge ? formatDate(formData.acknowledge) : "",
       closure_start_base_location: formData.startBaseLocation ? formatDate(formData.startBaseLocation) : "",
@@ -280,7 +280,7 @@ const CaseClosureDetails = ({
       // incident_responder_by: selectedDepartments,
       closure_added_by: userName,
       closure_modified_by: userName,
-      closure_modified_date: new Date().toISOString(), 
+      closure_modified_date: new Date().toISOString(),
       closure_remark: formData.closureRemark,
     };
 
@@ -309,11 +309,17 @@ const CaseClosureDetails = ({
         message: "Closure details saved successfully!",
       });
 
-      // Check if API response has remaining departments
       const remainingDepartments = res.data.Departments || [];
-
-      // Update selectedDepartments with remaining departments from API response
-      setSelectedDepartments(remainingDepartments);
+      setFormData({
+        responderName: "",
+        vehicleNumber: "",
+        acknowledge: "",
+        startBaseLocation: "",
+        atScene: "",
+        fromScene: "",
+        backToBase: "",
+        closureRemark: "",
+      });
       if (remainingDepartments.length === 0) {
         setFormData({
           vehicleNumber: "",
@@ -325,12 +331,11 @@ const CaseClosureDetails = ({
           backToBase: "",
           closureRemark: "",
         });
+        setSelectedDepartments([]);
         setSelectedIncidentFromSop(null);
         setIsDataCleared(true);
         fetchDispatchList();
-        await fetchResponderList();
-      } else {
-        // If departments are still pending, only clear vehicle and responder specific fields
+        await fetchResponderList(numericIncId);
         setFormData(prev => ({
           ...prev,
           vehicleNumber: "",
@@ -341,10 +346,9 @@ const CaseClosureDetails = ({
           atScene: "",
           fromScene: "",
           backToBase: "",
-          // Keep the datetime fields as they are likely same for all responders
         }));
-        await fetchResponderList();
-
+        setSelectedDepartments([]);
+        await fetchResponderList(numericIncId);
       }
 
     } catch (error) {
@@ -1022,7 +1026,7 @@ const CaseClosureDetails = ({
                     />
                   </Grid>
 
-                  <Grid item xs={6}>
+                  {/* <Grid item xs={6}>
                     <DateTimePicker
                       label="Start Location"
                       value={formData.startBaseLocation || null}
@@ -1179,6 +1183,168 @@ const CaseClosureDetails = ({
                           ? new Date(selectedIncidentFromSop.incident_details[0].inc_datetime)
                           : new Date())
                       }
+                      inputFormat="yyyy-MM-dd | HH:mm"
+                      slotProps={{
+                        textField: {
+                          size: 'small',
+                          required: true,
+                          error: !!validationErrors.backToBase,
+                          helperText: validationErrors.backToBase,
+                          fullWidth: true,
+                          placeholder: "yyyy-MM-dd | hh:mm",
+                          InputLabelProps: { shrink: true },
+                          InputProps: {
+                            sx: {
+                              color: textColor,
+                              height: "35px",
+                              fontSize: "0.85rem",
+                              "& .MuiSvgIcon-root": {
+                                color: "white",
+                              },
+                            },
+                          },
+                          sx: textFieldStyle,
+                        }
+                      }}
+                    />
+                  </Grid> */}
+                  <Grid item xs={6}>
+                    <DateTimePicker
+                      label="Start Location"
+                      value={formData.startBaseLocation || null}
+                      onChange={(newValue) => {
+                        handleChange("startBaseLocation", newValue);
+                        if (validationErrors.startBaseLocation) {
+                          setValidationErrors((prev) => ({
+                            ...prev,
+                            startBaseLocation: null,
+                          }));
+                        }
+                      }}
+                      ampm={false}
+                      minDateTime={formData.acknowledge || null}
+                      inputFormat="yyyy-MM-dd | HH:mm"
+                      slotProps={{
+                        textField: {
+                          size: 'small',
+                          required: true,
+                          error: !!validationErrors.startBaseLocation,
+                          helperText: validationErrors.startBaseLocation,
+                          fullWidth: true,
+                          placeholder: "yyyy-MM-dd | hh:mm",
+                          InputLabelProps: { shrink: true },
+                          InputProps: {
+                            sx: {
+                              color: textColor,
+                              height: "35px",
+                              "& .MuiSvgIcon-root": {
+                                color: "white",
+                              },
+                            },
+                          },
+                          sx: textFieldStyle,
+                        }
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <DateTimePicker
+                      label="At Scene"
+                      value={formData.atScene || null}
+                      onChange={(newValue) => {
+                        handleChange("atScene", newValue);
+                        if (validationErrors.atScene) {
+                          setValidationErrors((prev) => ({
+                            ...prev,
+                            atScene: null,
+                          }));
+                        }
+                      }}
+                      ampm={false}
+                      minDateTime={formData.startBaseLocation || null}
+                      inputFormat="yyyy-MM-dd | HH:mm"
+                      slotProps={{
+                        textField: {
+                          size: 'small',
+                          required: true,
+                          error: !!validationErrors.atScene,
+                          helperText: validationErrors.atScene,
+                          fullWidth: true,
+                          placeholder: "yyyy-MM-dd | hh:mm",
+                          InputLabelProps: { shrink: true },
+                          InputProps: {
+                            sx: {
+                              color: textColor,
+                              height: "35px",
+                              fontSize: "0.85rem",
+                              "& .MuiSvgIcon-root": {
+                                color: "white",
+                              },
+                            },
+                          },
+                          sx: textFieldStyle,
+                        }
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <DateTimePicker
+                      label="From Scene"
+                      value={formData.fromScene || null}
+                      onChange={(newValue) => {
+                        handleChange("fromScene", newValue);
+                        if (validationErrors.fromScene) {
+                          setValidationErrors((prev) => ({
+                            ...prev,
+                            fromScene: null,
+                          }));
+                        }
+                      }}
+                      ampm={false}
+                      minDateTime={formData.atScene || null}
+                      inputFormat="yyyy-MM-dd | HH:mm"
+                      slotProps={{
+                        textField: {
+                          size: 'small',
+                          required: true,
+                          error: !!validationErrors.fromScene,
+                          helperText: validationErrors.fromScene,
+                          fullWidth: true,
+                          placeholder: "yyyy-MM-dd | hh:mm",
+                          InputLabelProps: { shrink: true },
+                          InputProps: {
+                            sx: {
+                              color: textColor,
+                              height: "35px",
+                              fontSize: "0.85rem",
+                              "& .MuiSvgIcon-root": {
+                                color: "white",
+                              },
+                            },
+                          },
+                          sx: textFieldStyle,
+                        }
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <DateTimePicker
+                      label="Back to Base"
+                      value={formData.backToBase || null}
+                      onChange={(newValue) => {
+                        handleChange("backToBase", newValue);
+                        if (validationErrors.backToBase) {
+                          setValidationErrors((prev) => ({
+                            ...prev,
+                            backToBase: null,
+                          }));
+                        }
+                      }}
+                      ampm={false}
+                      minDateTime={formData.fromScene || null}
                       inputFormat="yyyy-MM-dd | HH:mm"
                       slotProps={{
                         textField: {

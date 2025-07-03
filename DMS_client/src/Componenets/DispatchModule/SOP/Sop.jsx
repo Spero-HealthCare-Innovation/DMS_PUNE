@@ -251,7 +251,7 @@ function Sop({ darkMode, setDarkMode, comments }) {
             fetchDispatchList={fetchDispatchList}
             highlightedId={highlightedId}
             setHighlightedId={setHighlightedId}
-             fetchIncidentDetails={fetchIncidentDetails}
+            fetchIncidentDetails={fetchIncidentDetails}
           />
         </Grid>
 

@@ -304,9 +304,10 @@ function Login() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            background:
-              "radial-gradient(6035.71% 72.44% at 0% 50%, rgba(95, 236, 200, 0.7) 0%, rgba(95, 236, 200, 0.035) 100%)",
-            backdropFilter: "blur(10px)",
+            // background:
+            //   "radial-gradient(6035.71% 72.44% at 0% 50%, rgba(95, 236, 200, 0.7) 0%, rgba(95, 236, 200, 0.035) 100%)",
+           background:"linear-gradient(rgb(83, 188, 225), rgb(19, 26, 28))",
+              backdropFilter: "blur(10px)",
           }}
         >
           <Box
@@ -320,24 +321,24 @@ function Login() {
             }}
           >
             <Box
-    sx={{
-      mb: 1, 
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    }}
-  >
-    <Box
-      component="img"
-      src={PMCLogo} 
-      alt="Company Logo"
-      sx={{
-        width: "70px", 
-        height: "auto",
-        objectFit: "contain",
-      }}
-    />
-  </Box>
+              sx={{
+                mb: 1,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Box
+                component="img"
+                src={PMCLogo}
+                alt="Company Logo"
+                sx={{
+                  width: "70px",
+                  height: "auto",
+                  objectFit: "contain",
+                }}
+              />
+            </Box>
             <Typography variant="h6" gutterBottom sx={{ color: "white" }}>
               <b>User Login</b>
             </Typography>
@@ -581,7 +582,7 @@ function Login() {
                   cursor: "pointer",
                 }}
               >
-                {/* Forgot Password? */}
+                {/* Change Password? */}
               </Typography>
             </Box>
 
@@ -609,20 +610,20 @@ function Login() {
             },
           }}
         >
-          <DialogTitle>Reset Password</DialogTitle>
+          <DialogTitle>Change Password</DialogTitle>
           <DialogContent
             sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
           >
             <Typography
               sx={{ color: "white", fontWeight: 500, fontSize: "12px" }}
             >
-              Enter User Name
+              Previous Password
             </Typography>
 
             <TextField
               fullWidth
               variant="outlined"
-              placeholder="Enter User Name"
+              placeholder="Enter old password"
               type="name"
               InputLabelProps={{ shrink: false }}
               sx={{
@@ -644,12 +645,12 @@ function Login() {
             <Typography
               sx={{ color: "white", fontWeight: 500, fontSize: "12px" }}
             >
-              Email or Mobile Number
+              New Password
             </Typography>
             <TextField
               fullWidth
               variant="outlined"
-              placeholder="Email or Mobile Number"
+              placeholder="Enter new password"
               onChange={(e) => setContact(e.target.value)}
               InputLabelProps={{ shrink: false }}
               sx={{
@@ -700,7 +701,7 @@ function Login() {
                 },
               }}
             >
-              Submit
+            Change
             </Button>
           </DialogActions>
         </Dialog>

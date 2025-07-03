@@ -338,7 +338,24 @@ const Incident = ({ darkMode }) => {
             if (response.status === 201) {
                 setSnackbarMessage("Incident Created Successfully");
                 setSnackbarOpen(true);
-                navigate('/sop');
+                setSelectedEmergencyValue('');
+                setSelectedDisaster('');
+                setAlertType('');
+                setCallerNumber('');
+                setCallerName('');
+                setSummaryId('');
+                setComments('');
+                setSopId([]);
+                setSelectedWard('');
+                setSelectedWardOfficer([]);
+                setErrors({});
+                setPopupText('');
+                setLattitude('');
+                setLongitude('');
+                setTimeout(() => {
+                    navigate('/sop');
+                }, 3000);
+
             } else if (response.status === 500) {
                 setSnackbarMessage("Internal Server Error");
                 setSnackbarOpen(true);

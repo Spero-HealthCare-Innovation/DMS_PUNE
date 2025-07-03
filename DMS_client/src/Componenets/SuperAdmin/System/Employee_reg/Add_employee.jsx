@@ -33,6 +33,7 @@ import {
 
 } from "../../../../CommonStyle/Style";
 import { useAuth } from './../../../../Context/ContextAPI';
+import KeyIcon from '@mui/icons-material/Key';
 
 function Add_employee({ darkMode }) {
   const port = import.meta.env.VITE_APP_API_KEY;
@@ -76,7 +77,9 @@ function Add_employee({ darkMode }) {
     ? "rgba(255, 255, 255, 0.16)"
     : "rgba(0, 0, 0, 0.04)";
 
+  const [passwordValue, setPasswordValue] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
+  const [addFormShow, setAddFormShow] = useState(false);
   const [empName, setEmpName] = useState('');
   const [empContact, setEmpContact] = useState('');
   const [empEmail, setEmpEmail] = useState('');
@@ -88,6 +91,8 @@ function Add_employee({ darkMode }) {
   const effectiveToken = newToken || localStorage.getItem("access_token");
   const [isEditing, setIsEditing] = useState(false);
   const [editingEmployeeId, setEditingEmployeeId] = useState(null);
+  console.log(editingEmployeeId, 'editingEmployeeId');
+
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [showUpdateAlert, setShowUpdateAlert] = useState(false);
@@ -464,7 +469,7 @@ function Add_employee({ darkMode }) {
 
 
 
-  // / 4. Add new function to handle "Add New Employee" button click
+  // / 4. Add new function to handle button click
   const handleAddNewEmployee = () => {
     // Reset form
     setEmpName('');
@@ -669,60 +674,70 @@ function Add_employee({ darkMode }) {
   );
 
   const paginatedData = filteredEmployees;
-
-  // const validateForm = () => {
-  //   const errors = {};
-
-  //   if (!empName.trim()) {
-  //     errors.empName = 'Employee name is required';
-  //   } else if (!validateName(empName)) {
-  //     errors.empName = 'Please enter a valid name (letters, spaces, underscore only)';
-  //   }
-
-  //   if (!empContact.trim()) {
-  //     errors.empContact = 'Contact number is required';
-  //   } else if (!validateContact(empContact)) {
-  //     errors.empContact = 'Please enter a valid contact number (numbers only, min 10 digits)';
-  //   }
-
-  //   if (!empEmail.trim()) {
-  //     errors.empEmail = 'Email is required';
-  //   } else if (!validateEmail(empEmail)) {
-  //     errors.empEmail = 'Please enter a valid email address';
-  //   }
-
-  //   setFormErrors(errors);
-  //   return Object.keys(errors).length === 0;
-  // };
-
-
   const validatePassword = (password) => {
     return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/.test(password);
   };
 
   const fetchDistrictsByState = async (stateId) => {
-    // This function should already exist in your context, if not add it
     setSelectedStateId(stateId);
   };
 
   const fetchTehsilsByDistrict = async (districtId) => {
-    // This function should already exist in your context, if not add it  
     setSelectedDistrictId(districtId);
   };
 
   const fetchCitiesByTehsil = async (tehsilId) => {
-    // This function should already exist in your context, if not add it
     setSelectedTehsilId(tehsilId);
   };
 
   const fetchWardsByCity = async (cityId) => {
-    // This function should already exist in your context, if not add it
     setSelectedCityId(cityId);
   };
 
+  // Password Change
+
+  const [resetPassword, setResetPassword] = useState('');
+  const [resetPassword2, setResetPassword2] = useState('');
+  const [resetPasswordErrors, setResetPasswordErrors] = useState({});
+
+  const handlePasswordReset = async () => {
+    let errors = {};
+    if (resetPassword !== resetPassword2) {
+      errors.password = "Passwords do not match";
+      errors.password2 = "Passwords do not match";
+    } else if (!validatePassword(resetPassword)) {
+      errors.password = "Password must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 special character.";
+    }
+    setResetPasswordErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      showAlertMessage(Object.values(errors)[0], 'error');
+      return;
+    }
+    try {
+      await axios.post(
+        `${port}/admin_web/emp_forgotpassword/`,
+        {
+          user_id: editingEmployeeId,
+          new_password: resetPassword,
+          confirm_password: resetPassword2
+        },
+        { headers: { Authorization: `Bearer ${effectiveToken}` } }
+      );
+      showAlertMessage("Password updated successfully!", "success");
+      setResetPassword('');
+      setResetPassword2('');
+      setResetPasswordErrors({});
+      setPasswordValue('');
+      setIsEditing(false);
+      setAddFormShow(false);
+      await fetchEmployees();
+    } catch (err) {
+      showAlertMessage("Failed to update password.", "error");
+    }
+  };
 
   return (
-    <div style={{ marginLeft: "3.5rem" }}>
+    <div style={{ marginLeft: "4rem" }}>
       <Snackbar
         open={showAlert}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
@@ -805,7 +820,7 @@ function Add_employee({ darkMode }) {
 
       <Grid container spacing={2}>
         <Grid item xs={12} md={7}>
-          <Paper elevation={3} sx={{ padding: 3, borderRadius: 3, backgroundColor: paper, mt: 1, mb: 1, height: "89%" }}>
+          <Paper elevation={3} sx={{ padding: 2, borderRadius: 3, backgroundColor: paper, mt: 1, mb: 1, height: "auto" }}>
             <TableContainer >
               <Table >
                 <TableHead>
@@ -830,8 +845,6 @@ function Add_employee({ darkMode }) {
                           Sr. No
                         </Typography>
                       </StyledCardContent>
-
-
 
                       <StyledCardContent
                         sx={{
@@ -885,7 +898,6 @@ function Add_employee({ darkMode }) {
                     </EnquiryCard>
                   </TableRow>
                 </TableHead>
-
 
                 <TableBody
                   sx={{
@@ -983,7 +995,6 @@ function Add_employee({ darkMode }) {
                               </Typography>
                             </StyledCardContent>
 
-
                             <StyledCardContent
                               sx={{
                                 flex: 2,
@@ -1011,17 +1022,20 @@ function Add_employee({ darkMode }) {
                               sx={{
                                 flex: 1,
                                 justifyContent: "center",
-                                ...fontsTableBody,
+                                // ...fontsTableBody,
                               }}
                             >
                               <MoreHorizIcon
-                                onClick={(e) => handleOpen(e, item)}
+                                onClick={(e) => {
+                                  console.log(item.fullData?.emp_id, 'empyyyyyy');
+                                  handleOpen(e, item);
+                                }}
                                 sx={{
                                   color: "rgb(95,200,236)",
                                   cursor: "pointer",
-                                  fontSize: 28,
+                                  fontSize: 20,
                                   justifyContent: "center",
-                                  ...fontsTableBody,
+                                  // ...fontsTableBody,
                                 }}
                               />
                             </StyledCardContent>
@@ -1032,7 +1046,6 @@ function Add_employee({ darkMode }) {
                 </TableBody>
               </Table>
             </TableContainer>
-
 
             <Box
               display="flex"
@@ -1126,7 +1139,7 @@ function Add_employee({ darkMode }) {
           anchorEl={anchorEl}
           onClose={handleClose}
           anchorOrigin={{
-            vertical: "center",
+            vertical: "left",
             horizontal: "right",
           }}
           transformOrigin={{
@@ -1135,10 +1148,11 @@ function Add_employee({ darkMode }) {
           }}
           PaperProps={{
             sx: {
-              p: 2,
+              p: 1,
               display: "flex",
               flexDirection: "column",
-              gap: 1.5,
+              alignItems: 'flex-start',
+              gap: 1,
               borderRadius: 2,
               minWidth: 120,
             },
@@ -1148,6 +1162,7 @@ function Add_employee({ darkMode }) {
             fullWidth
             variant="outlined"
             color="error"
+            sx={{ justifyContent: "flex-start" }}
             startIcon={<DeleteOutline />}
             onClick={async () => {
               if (selectedEmployee && selectedEmployee.fullData) {
@@ -1169,6 +1184,7 @@ function Add_employee({ darkMode }) {
                   alert("Failed to delete employee");
                 }
               }
+              setPasswordValue('');
               handleClose();
             }}
           >
@@ -1179,6 +1195,7 @@ function Add_employee({ darkMode }) {
             fullWidth
             variant="outlined"
             color="warning"
+            sx={{ justifyContent: "flex-start" }}
             startIcon={<EditOutlined />}
             onClick={async () => {
               if (selectedEmployee && selectedEmployee.fullData) {
@@ -1217,7 +1234,7 @@ function Add_employee({ darkMode }) {
                 if (empData.ward_id) {
                   setSelectedWardId(empData.ward_id);
                 }
-
+                setPasswordValue('');
                 handleClose();
               }
             }}
@@ -1226,6 +1243,32 @@ function Add_employee({ darkMode }) {
             Edit
           </Button>
 
+          <Button
+            fullWidth
+            variant="outlined"
+            color="primary"
+            startIcon={<KeyIcon />}
+            sx={{
+              justifyContent: "flex-start",
+              borderColor: "#1976d2",
+              color: "#1976d2",
+              '&:hover': {
+                borderColor: "#1565c0",
+                color: "#1565c0",
+                backgroundColor: "rgba(25, 118, 210, 0.04)"
+              }
+            }}
+            onClick={() => {
+              setPasswordValue('1');
+              setIsEditing(true);
+              setAddFormShow(false);
+              if (selectedEmployee && selectedEmployee.fullData?.emp_id) {
+                setEditingEmployeeId(selectedEmployee.fullData.emp_id);
+              }
+            }}
+          >
+            Password
+          </Button>
         </Popover>
 
         <Grid item xs={12} md={4.9}>
@@ -1237,22 +1280,15 @@ function Add_employee({ darkMode }) {
               mb={2}
               flexWrap="wrap"
             >
-
-              {/* <Typography
-                sx={{
-                  color: labelColor,
-                  fontWeight: 600,
-                  fontSize: 18,
-                  fontFamily,
-                }}
-              >
-                {isEditing ? "Edit Employee" : "Add Employee"}
-              </Typography> */}
               <Button
                 variant="contained"
                 startIcon={<AddCircleOutline />}
-                disabled={!isEditing} // Show only when in editing mode
-                onClick={handleAddNewEmployee}
+                disabled={!isEditing}
+                // onClick={handleAddNewEmployee}
+                onClick={() => {
+                  handleAddNewEmployee();
+                  setAddFormShow(true);
+                }}
                 sx={{
                   backgroundColor: "rgb(223,76,76)",
                   color: "#fff",
@@ -1268,509 +1304,534 @@ function Add_employee({ darkMode }) {
               </Button>
             </Box>
 
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-              {/* Employee Name Field */}
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  value={empName}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setEmpName(value);
-                    if (formErrors.empName) {
-                      setFormErrors(prev => ({ ...prev, empName: '' }));
-                    }
-                  }}
-                  placeholder="Employee Name"
-                  error={!!formErrors.empName}
-                  helperText={formErrors.empName}
-                  InputLabelProps={{ shrink: false }}
-                  sx={inputStyle}
-                />
-              </Grid>
+            {
+              passwordValue === '1' && addFormShow === false ?
+                (
+                  <>
+                    <Grid container spacing={2} sx={{ mb: 3 }}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          type="password"
+                          value={resetPassword}
+                          onChange={(e) => {
+                            setResetPassword(e.target.value);
+                            if (resetPasswordErrors.password) {
+                              setResetPasswordErrors(prev => ({ ...prev, password: '' }));
+                            }
+                          }}
+                          placeholder="Password"
+                          error={!!resetPasswordErrors.password}
+                          // helperText={resetPasswordErrors.password}
+                          InputLabelProps={{ shrink: false }}
+                          sx={inputStyle}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          type="password"
+                          value={resetPassword2}
+                          onChange={(e) => {
+                            setResetPassword2(e.target.value);
+                            if (resetPasswordErrors.password2) {
+                              setResetPasswordErrors(prev => ({ ...prev, password2: '' }));
+                            }
+                          }}
+                          placeholder="Confirm Password"
+                          error={!!resetPasswordErrors.password2}
+                          helperText={resetPasswordErrors.password2}
+                          InputLabelProps={{ shrink: false }}
+                          sx={inputStyle}
+                        />
+                      </Grid>
+                    </Grid>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3, mb: 1 }}>
+                      <Button
+                        variant="contained"
+                        disabled={loading}
+                        sx={{
+                          mt: 1,
+                          width: "40%",
+                          backgroundColor: "rgb(18,166,95,0.8)",
+                          color: "#fff",
+                          fontWeight: "bold",
+                          borderRadius: "12px",
+                          textTransform: 'none',
+                          "&:hover": {
+                            backgroundColor: "rgb(18,166,95,0.8)",
+                            color: "white !important",
+                            textTransform: 'none',
+                          },
+                        }}
+                        onClick={handlePasswordReset}
+                      >
+                        Set Password
+                      </Button>
+                    </Box>
+                  </>
+                )
+                :
+                (
+                  <>
+                    <Grid container spacing={2} sx={{ mb: 3 }}>
+                      {/* Employee Name Field */}
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          value={empName}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setEmpName(value);
+                            if (formErrors.empName) {
+                              setFormErrors(prev => ({ ...prev, empName: '' }));
+                            }
+                          }}
+                          placeholder="Employee Name"
+                          error={!!formErrors.empName}
+                          helperText={formErrors.empName}
+                          InputLabelProps={{ shrink: false }}
+                          sx={inputStyle}
+                        />
+                      </Grid>
 
-              {/* Employee Contact Number Field */}
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  placeholder="Emp Contact No"
-                  value={empContact}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (/^[0-9]*$/.test(value) && value.length <= 10) {
-                      setEmpContact(value);
-                      if (formErrors.empContact) {
-                        setFormErrors(prev => ({ ...prev, empContact: '' }));
-                      }
-                    }
-                  }}
-                  error={!!formErrors.empContact}
-                  helperText={formErrors.empContact}
-                  InputLabelProps={{ shrink: false }}
-                  sx={inputStyle}
-                />
-              </Grid>
-            </Grid>
+                      {/* Employee Contact Number Field */}
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          placeholder="Emp Contact No"
+                          value={empContact}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (/^[0-9]*$/.test(value) && value.length <= 10) {
+                              setEmpContact(value);
+                              if (formErrors.empContact) {
+                                setFormErrors(prev => ({ ...prev, empContact: '' }));
+                              }
+                            }
+                          }}
+                          error={!!formErrors.empContact}
+                          helperText={formErrors.empContact}
+                          InputLabelProps={{ shrink: false }}
+                          sx={inputStyle}
+                        />
+                      </Grid>
+                    </Grid>
 
-            <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-              {/* First TextField */}
-              <TextField
-                fullWidth
-                placeholder="Employee Email"
-                value={empEmail}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setEmpEmail(value);
-                  if (formErrors.empEmail) {
-                    setFormErrors(prev => ({ ...prev, empEmail: '' }));
-                  }
-                }}
-                error={!!formErrors.empEmail}
-                helperText={formErrors.empEmail}
-                sx={inputStyle}
-              />
+                    <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+                      {/* First TextField */}
+                      <TextField
+                        fullWidth
+                        placeholder="Employee Email"
+                        value={empEmail}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setEmpEmail(value);
+                          if (formErrors.empEmail) {
+                            setFormErrors(prev => ({ ...prev, empEmail: '' }));
+                          }
+                        }}
+                        error={!!formErrors.empEmail}
+                        helperText={formErrors.empEmail}
+                        sx={inputStyle}
+                      />
 
-              {/* Second TextField */}
+                      {/* Second TextField */}
 
-              <TextField
-                fullWidth
-                type="date"
-                value={empDOJ}
-                onChange={(e) => {
-                  setEmpDOJ(e.target.value);
-                  if (formErrors.empDOJ) {
-                    setFormErrors(prev => ({ ...prev, empDOJ: '' }));
-                  }
-                }}
-                error={!!formErrors.empDOJ}
-                helperText={formErrors.empDOJ}
-                sx={{
-                  ...selectStyles,
-                  "& input[type='date']::-webkit-calendar-picker-indicator": {
-                    opacity: 0,
-                    cursor: "pointer"
-                  },
-                  "& input[type='date']": {
-                    color: empDOJ ? (darkMode ? "#9e9e9e" : "#000") : "transparent",
-                    fontSize: "13px",
-                  },
-                  "& input[type='date']:focus": {
-                    color: darkMode ? "#000" : "#000",
-                  },
-                  "& input[type='date']:before": {
-                    content: empDOJ ? '""' : '"Employee DOJ"',
-                    color: "#9e9e9e",
-                    position: "absolute",
-                    fontSize: "13px",
-                  }
-                }}
-                InputProps={{
-                  placeholder: "Employee DOJ"
-                }}
-                onFocus={(e) => {
-                  e.target.showPicker();
-                }}
-              />
-            </Box>
+                      <TextField
+                        fullWidth
+                        type="date"
+                        value={empDOJ}
+                        onChange={(e) => {
+                          setEmpDOJ(e.target.value);
+                          if (formErrors.empDOJ) {
+                            setFormErrors(prev => ({ ...prev, empDOJ: '' }));
+                          }
+                        }}
+                        error={!!formErrors.empDOJ}
+                        helperText={formErrors.empDOJ}
+                        sx={{
+                          ...selectStyles,
+                          "& input[type='date']::-webkit-calendar-picker-indicator": {
+                            opacity: 0,
+                            cursor: "pointer"
+                          },
+                          "& input[type='date']": {
+                            color: empDOJ ? (darkMode ? "#9e9e9e" : "#000") : "transparent",
+                            fontSize: "13px",
+                          },
+                          "& input[type='date']:focus": {
+                            color: darkMode ? "#000" : "#000",
+                          },
+                          "& input[type='date']:before": {
+                            content: empDOJ ? '""' : '"Employee DOJ"',
+                            color: "#9e9e9e",
+                            position: "absolute",
+                            fontSize: "13px",
+                          }
+                        }}
+                        InputProps={{
+                          placeholder: "Employee DOJ"
+                        }}
+                        onFocus={(e) => {
+                          e.target.showPicker();
+                        }}
+                      />
+                    </Box>
 
-            <Grid container spacing={2} sx={{ mb: 2 }}>
-              {/* Group Select */}
-              <Grid item xs={12} sm={6}>
-                <Select
-                  value={groupId}
-                  onChange={(e) => {
-                    setGroupId(e.target.value);
-                    if (formErrors.groupId) {
-                      setFormErrors((prev) => ({ ...prev, groupId: '' }));
-                    }
-                  }}
-                  fullWidth
-                  displayEmpty
-                  placeholder="Select Group"
-                  defaultValue=""
-                  error={!!formErrors.groupId}
-                  inputProps={{
-                    "aria-label": "Select Group",
-                  }}
-                  sx={{
-                    ...selectStyles,
-                    ...(formErrors.groupId && {
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#d32f2f',
-                      },
-                    }),
-                  }}
-                  IconComponent={KeyboardArrowDownIcon}
-                >
-                  <MenuItem value="" disabled sx={inputStyle}>
-                    Group Name
-                  </MenuItem>
-                  {groupList.map((group) => (
-                    <MenuItem key={group.grp_id} value={group.grp_id.toString()}>
-                      {group.grp_name}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {formErrors.groupId && (
-                  <Typography variant="caption" color="error" sx={{ ml: 1, fontSize: '0.75rem' }}>
-                    {formErrors.groupId}
-                  </Typography>
-                )}
-              </Grid>
+                    <Grid container spacing={2} sx={{ mb: 2 }}>
+                      {/* Group Select */}
+                      <Grid item xs={12} sm={6}>
+                        <Select
+                          value={groupId}
+                          onChange={(e) => {
+                            setGroupId(e.target.value);
+                            if (formErrors.groupId) {
+                              setFormErrors((prev) => ({ ...prev, groupId: '' }));
+                            }
+                          }}
+                          fullWidth
+                          displayEmpty
+                          placeholder="Select Group"
+                          defaultValue=""
+                          error={!!formErrors.groupId}
+                          inputProps={{
+                            "aria-label": "Select Group",
+                          }}
+                          sx={{
+                            ...selectStyles,
+                            ...(formErrors.groupId && {
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#d32f2f',
+                              },
+                            }),
+                          }}
+                          IconComponent={KeyboardArrowDownIcon}
+                        >
+                          <MenuItem value="" disabled sx={inputStyle}>
+                            Group Name
+                          </MenuItem>
+                          {groupList.map((group) => (
+                            <MenuItem key={group.grp_id} value={group.grp_id.toString()}>
+                              {group.grp_name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {formErrors.groupId && (
+                          <Typography variant="caption" color="error" sx={{ ml: 1, fontSize: '0.75rem' }}>
+                            {formErrors.groupId}
+                          </Typography>
+                        )}
+                      </Grid>
 
-              {/* State Select */}
-              <Grid item xs={12} sm={6}>
-                <Select
-                  value={selectedStateId}
-                  onChange={(e) => {
-                    handleStateChange(e);
-                    if (formErrors.selectedStateId) {
-                      setFormErrors((prev) => ({ ...prev, selectedStateId: '' }));
-                    }
-                  }}
-                  fullWidth
-                  displayEmpty
-                  placeholder="Select State"
-                  defaultValue=""
-                  error={!!formErrors.selectedStateId}
-                  inputProps={{
-                    "aria-label": "Select State",
-                  }}
-                  sx={{
-                    ...selectStyles,
-                    ...(formErrors.selectedStateId && {
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#d32f2f',
-                      },
-                    }),
-                  }}
-                  IconComponent={KeyboardArrowDownIcon}
-                >
-                  <MenuItem value="" disabled sx={inputStyle}>
-                    Select State
-                  </MenuItem>
-                  {states.map((state) => (
-                    <MenuItem key={state.state_id} value={state.state_id}>
-                      {state.state_name}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {formErrors.selectedStateId && (
-                  <Typography variant="caption" color="error" sx={{ ml: 1, fontSize: '0.75rem' }}>
-                    {formErrors.selectedStateId}
-                  </Typography>
-                )}
-              </Grid>
-            </Grid>
+                      {/* State Select */}
+                      <Grid item xs={12} sm={6}>
+                        <Select
+                          value={selectedStateId}
+                          onChange={(e) => {
+                            handleStateChange(e);
+                            if (formErrors.selectedStateId) {
+                              setFormErrors((prev) => ({ ...prev, selectedStateId: '' }));
+                            }
+                          }}
+                          fullWidth
+                          displayEmpty
+                          placeholder="Select State"
+                          defaultValue=""
+                          error={!!formErrors.selectedStateId}
+                          inputProps={{
+                            "aria-label": "Select State",
+                          }}
+                          sx={{
+                            ...selectStyles,
+                            ...(formErrors.selectedStateId && {
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#d32f2f',
+                              },
+                            }),
+                          }}
+                          IconComponent={KeyboardArrowDownIcon}
+                        >
+                          <MenuItem value="" disabled sx={inputStyle}>
+                            Select State
+                          </MenuItem>
+                          {states.map((state) => (
+                            <MenuItem key={state.state_id} value={state.state_id}>
+                              {state.state_name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {formErrors.selectedStateId && (
+                          <Typography variant="caption" color="error" sx={{ ml: 1, fontSize: '0.75rem' }}>
+                            {formErrors.selectedStateId}
+                          </Typography>
+                        )}
+                      </Grid>
+                    </Grid>
 
-            <Grid container spacing={2} sx={{ mb: 2 }}>
-              {/* District Select */}
-              <Grid item xs={12} sm={6}>
-                <Select
-                  fullWidth
-                  displayEmpty
-                  placeholder="Select District"
-                  defaultValue=""
-                  value={selectedDistrictId}
-                  onChange={(e) => {
-                    handleDistrictChange(e);
-                    if (formErrors.selectedDistrictId) {
-                      setFormErrors(prev => ({ ...prev, selectedDistrictId: '' }));
-                    }
-                  }}
-                  error={!!formErrors.selectedDistrictId}
-                  inputProps={{ "aria-label": "Select District" }}
-                  sx={{
-                    ...selectStyles,
-                    ...(formErrors.selectedDistrictId && {
-                      '& .MuiOutlinedInput-notchedOutline': { borderColor: '#d32f2f' }
-                    })
-                  }}
-                  IconComponent={KeyboardArrowDownIcon}
-                >
-                  <MenuItem value="" disabled>Select District</MenuItem>
-                  {districts.map((district) => (
-                    <MenuItem key={district.dis_id} value={district.dis_id}>
-                      {district.dis_name}
-                    </MenuItem>
-                  ))}
-                </Select>
+                    <Grid container spacing={2} sx={{ mb: 2 }}>
+                      {/* District Select */}
+                      <Grid item xs={12} sm={6}>
+                        <Select
+                          fullWidth
+                          displayEmpty
+                          placeholder="Select District"
+                          defaultValue=""
+                          value={selectedDistrictId}
+                          onChange={(e) => {
+                            handleDistrictChange(e);
+                            if (formErrors.selectedDistrictId) {
+                              setFormErrors(prev => ({ ...prev, selectedDistrictId: '' }));
+                            }
+                          }}
+                          error={!!formErrors.selectedDistrictId}
+                          inputProps={{ "aria-label": "Select District" }}
+                          sx={{
+                            ...selectStyles,
+                            ...(formErrors.selectedDistrictId && {
+                              '& .MuiOutlinedInput-notchedOutline': { borderColor: '#d32f2f' }
+                            })
+                          }}
+                          IconComponent={KeyboardArrowDownIcon}
+                        >
+                          <MenuItem value="" disabled>Select District</MenuItem>
+                          {districts.map((district) => (
+                            <MenuItem key={district.dis_id} value={district.dis_id}>
+                              {district.dis_name}
+                            </MenuItem>
+                          ))}
+                        </Select>
 
-                {formErrors.selectedDistrictId && (
-                  <Typography variant="caption" color="error" sx={{ ml: 1, fontSize: '0.75rem' }}>
-                    {formErrors.selectedDistrictId}
-                  </Typography>
-                )}
-              </Grid>
+                        {formErrors.selectedDistrictId && (
+                          <Typography variant="caption" color="error" sx={{ ml: 1, fontSize: '0.75rem' }}>
+                            {formErrors.selectedDistrictId}
+                          </Typography>
+                        )}
+                      </Grid>
 
-              {/* Tehsil Select */}
-              <Grid item xs={12} sm={6}>
-                <Select
-                  fullWidth
-                  displayEmpty
-                  placeholder="Select Tehsil"
-                  defaultValue=""
-                  value={selectedTehsilId}
-                  onChange={(e) => {
-                    handleTehsilChange(e);
-                    if (formErrors.selectedTehsilId) {
-                      setFormErrors(prev => ({ ...prev, selectedTehsilId: '' }));
-                    }
-                  }}
-                  error={!!formErrors.selectedTehsilId}
-                  inputProps={{ "aria-label": "Select Tehsil" }}
-                  sx={{
-                    ...selectStyles,
-                    ...(formErrors.selectedTehsilId && {
-                      '& .MuiOutlinedInput-notchedOutline': { borderColor: '#d32f2f' }
-                    })
-                  }}
-                  IconComponent={KeyboardArrowDownIcon}
-                >
-                  <MenuItem value="" disabled>Select Tehsil</MenuItem>
-                  {Tehsils.map((tehsil) => (
-                    <MenuItem key={tehsil.tah_id} value={tehsil.tah_id}>
-                      {tehsil.tah_name}
-                    </MenuItem>
-                  ))}
-                </Select>
+                      {/* Tehsil Select */}
+                      <Grid item xs={12} sm={6}>
+                        <Select
+                          fullWidth
+                          displayEmpty
+                          placeholder="Select Tehsil"
+                          defaultValue=""
+                          value={selectedTehsilId}
+                          onChange={(e) => {
+                            handleTehsilChange(e);
+                            if (formErrors.selectedTehsilId) {
+                              setFormErrors(prev => ({ ...prev, selectedTehsilId: '' }));
+                            }
+                          }}
+                          error={!!formErrors.selectedTehsilId}
+                          inputProps={{ "aria-label": "Select Tehsil" }}
+                          sx={{
+                            ...selectStyles,
+                            ...(formErrors.selectedTehsilId && {
+                              '& .MuiOutlinedInput-notchedOutline': { borderColor: '#d32f2f' }
+                            })
+                          }}
+                          IconComponent={KeyboardArrowDownIcon}
+                        >
+                          <MenuItem value="" disabled>Select Tehsil</MenuItem>
+                          {Tehsils.map((tehsil) => (
+                            <MenuItem key={tehsil.tah_id} value={tehsil.tah_id}>
+                              {tehsil.tah_name}
+                            </MenuItem>
+                          ))}
+                        </Select>
 
-                {formErrors.selectedTehsilId && (
-                  <Typography variant="caption" color="error" sx={{ ml: 1, fontSize: '0.75rem' }}>
-                    {formErrors.selectedTehsilId}
-                  </Typography>
-                )}
-              </Grid>
-            </Grid>
+                        {formErrors.selectedTehsilId && (
+                          <Typography variant="caption" color="error" sx={{ ml: 1, fontSize: '0.75rem' }}>
+                            {formErrors.selectedTehsilId}
+                          </Typography>
+                        )}
+                      </Grid>
+                    </Grid>
 
-            <Grid container spacing={2} sx={{ mb: 2 }}>
-              {/* City Select */}
-              <Grid item xs={12} sm={6}>
-                <Select
-                  fullWidth
-                  displayEmpty
-                  value={selectedCityID}
-                  onChange={(e) => {
-                    handleCityChange(e);
-                    if (formErrors.selectedCityID) {
-                      setFormErrors(prev => ({ ...prev, selectedCityID: '' }));
-                    }
-                  }}
-                  placeholder="Select City"
-                  defaultValue=""
-                  error={!!formErrors.selectedCityID}
-                  inputProps={{
-                    "aria-label": "Select City",
-                  }}
-                  sx={{
-                    ...selectStyles,
-                    ...(formErrors.selectedCityID && {
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#d32f2f',
-                      }
-                    })
-                  }}
-                  IconComponent={KeyboardArrowDownIcon}
-                >
-                  <MenuItem value="" disabled>
-                    Select City
-                  </MenuItem>
-                  {Citys.map((city) => (
-                    <MenuItem key={city.cit_id} value={city.cit_id}>
-                      {city.cit_name}
-                    </MenuItem>
-                  ))}
-                </Select>
+                    <Grid container spacing={2} sx={{ mb: 2 }}>
+                      {/* City Select */}
+                      <Grid item xs={12} sm={6}>
+                        <Select
+                          fullWidth
+                          displayEmpty
+                          value={selectedCityID}
+                          onChange={(e) => {
+                            handleCityChange(e);
+                            if (formErrors.selectedCityID) {
+                              setFormErrors(prev => ({ ...prev, selectedCityID: '' }));
+                            }
+                          }}
+                          placeholder="Select City"
+                          defaultValue=""
+                          error={!!formErrors.selectedCityID}
+                          inputProps={{
+                            "aria-label": "Select City",
+                          }}
+                          sx={{
+                            ...selectStyles,
+                            ...(formErrors.selectedCityID && {
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#d32f2f',
+                              }
+                            })
+                          }}
+                          IconComponent={KeyboardArrowDownIcon}
+                        >
+                          <MenuItem value="" disabled>
+                            Select City
+                          </MenuItem>
+                          {Citys.map((city) => (
+                            <MenuItem key={city.cit_id} value={city.cit_id}>
+                              {city.cit_name}
+                            </MenuItem>
+                          ))}
+                        </Select>
 
-                {formErrors.selectedCityID && (
-                  <Typography variant="caption" color="error" sx={{ ml: 1, fontSize: '0.75rem' }}>
-                    {formErrors.selectedCityID}
-                  </Typography>
-                )}
-              </Grid>
+                        {formErrors.selectedCityID && (
+                          <Typography variant="caption" color="error" sx={{ ml: 1, fontSize: '0.75rem' }}>
+                            {formErrors.selectedCityID}
+                          </Typography>
+                        )}
+                      </Grid>
 
-              {/* Ward Select  */}
+                      {/* Ward Select  */}
 
-              <Grid item xs={12} sm={6}>
-                <Select
-                  fullWidth
-                  displayEmpty
-                  value={selectedWardId}
-                  onChange={handleWardChange}
-                  placeholder="Select Ward"
-                  defaultValue=""
-                  error={!!formErrors.selectedWardId}
-                  helperText={formErrors.empName}
-                  inputProps={{
-                    "aria-label": "Select Ward",
-                  }}
-                  sx={{
-                    ...selectStyles,
-                    ...(formErrors.selectedWardId && {
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#d32f2f',
-                      }
-                    })
-                  }}
-                  IconComponent={KeyboardArrowDownIcon}
-                >
-                  <MenuItem value="" disabled>
-                    Select Ward
-                  </MenuItem>
-                  {Wards.map((ward) => (
-                    <MenuItem key={ward.pk_id} value={ward.pk_id}>
-                      {ward.ward_name}
-                    </MenuItem>
-                  ))}
-                </Select>
+                      <Grid item xs={12} sm={6}>
+                        <Select
+                          fullWidth
+                          displayEmpty
+                          value={selectedWardId}
+                          onChange={handleWardChange}
+                          placeholder="Select Ward"
+                          defaultValue=""
+                          error={!!formErrors.selectedWardId}
+                          helperText={formErrors.empName}
+                          inputProps={{
+                            "aria-label": "Select Ward",
+                          }}
+                          sx={{
+                            ...selectStyles,
+                            ...(formErrors.selectedWardId && {
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#d32f2f',
+                              }
+                            })
+                          }}
+                          IconComponent={KeyboardArrowDownIcon}
+                        >
+                          <MenuItem value="" disabled>
+                            Select Ward
+                          </MenuItem>
+                          {Wards.map((ward) => (
+                            <MenuItem key={ward.pk_id} value={ward.pk_id}>
+                              {ward.ward_name}
+                            </MenuItem>
+                          ))}
+                        </Select>
 
-                {formErrors.selectedWardId && (
-                  <Typography variant="caption" color="error" sx={{ ml: 1, fontSize: '0.75rem' }}>
-                    {formErrors.selectedWardId}
-                  </Typography>
-                )}
-              </Grid>
-
-
-              {/* DOB TextField */}
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  type="date"
-                  value={empDOB}
-                  onChange={(e) => {
-                    setEmpDOB(e.target.value);
-                    if (formErrors.empDOB) {
-                      setFormErrors(prev => ({ ...prev, empDOB: '' }));
-                    }
-                  }}
-                  error={!!formErrors.empDOB}
-                  helperText={formErrors.empDOB}
-                  sx={{
-                    ...selectStyles,
-                    "& input[type='date']::-webkit-calendar-picker-indicator": {
-                      opacity: 0,
-                      cursor: "pointer"
-                    },
-                    "& input[type='date']": {
-                      color: empDOB ? (darkMode ? "#9e9e9e" : "#000") : "transparent",
-                      fontSize: "13px",
-                    },
-                    "& input[type='date']:focus": {
-                      color: darkMode ? "#000" : "#000",
-                    },
-                    "& input[type='date']:before": {
-                      content: empDOB ? '""' : '"Employee DOB"',
-                      color: "#9e9e9e",
-                      position: "absolute",
-                      fontSize: "13px",
-                    }
-                  }}
-                  InputProps={{
-                    placeholder: "Employee DOB"
-                  }}
-                  onFocus={(e) => {
-                    e.target.showPicker();
-                  }}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
-                  error={!!formErrors.empName}
-                  helperText={formErrors.empName}
-                  InputLabelProps={{ shrink: false }}
-                  sx={inputStyle}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  value={password2}
-                  onChange={(e) => setPassword2(e.target.value)}
-                  placeholder="Confirm Password"
-                  error={!!formErrors.empName}
-                  helperText={formErrors.empName}
-                  InputLabelProps={{ shrink: false }}
-                  sx={inputStyle}
-                />
-              </Grid>
-            </Grid>
+                        {formErrors.selectedWardId && (
+                          <Typography variant="caption" color="error" sx={{ ml: 1, fontSize: '0.75rem' }}>
+                            {formErrors.selectedWardId}
+                          </Typography>
+                        )}
+                      </Grid>
 
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3, mb: 1 }}>
-              {isEditing ? (
-                <>
-                  <Button
-                    variant="contained"
-                    onClick={handleUpdate}
-                    disabled={loading}
-                    sx={{
-                      mt: 2,
-                      width: "40%",
-                      backgroundColor: "rgb(18,166,95,0.8)",
-                      color: "#fff",
-                      fontWeight: "bold",
-                      borderRadius: "12px",
-                      "&:hover": {
-                        backgroundColor: "rgb(18,166,95,0.8)",
-                        color: "white !important",
-                      },
-                    }}
-                  >
-                    Update
-                  </Button>
-                  {/* <Button
-                    variant="outlined"
-                    onClick={handleCancel}
-                    disabled={loading}
-                    sx={{
-                      mt: 2,
-                      width: "40%",
-                       borderColor: "rgb(223,76,76)",
-                      color:darkMode ?"#fff":"rgb(223,76,76)",
-                      fontWeight: "bold",
-                      borderRadius: "12px",
-                      "&:hover": {
-                        borderColor: "rgb(223,76,76)",
-                       backgroundColor: "rgb(223,76,76)",
-                        color: "white !important",
-                      },
-                    }}
-                  >
-                    Cancel
-                  </Button> */}
-                </>
-              ) : (
-                <Button
-                  variant="contained"
-                  onClick={handleSubmit}
-                  disabled={loading}
-                  sx={{
-                    mt: 1,
-                    width: "40%",
-                    backgroundColor: "rgb(18,166,95,0.8)",
-                    color: "#fff",
-                    fontWeight: "bold",
-                    borderRadius: "12px",
-                    textTransform: 'none',
-                    "&:hover": {
-                      backgroundColor: "rgb(18,166,95,0.8)",
-                      color: "white !important",
-                      textTransform: 'none',
-                    },
-                  }}
-                >
-                  Submit
-                </Button>
-              )}
-            </Box>
+                      {/* DOB TextField */}
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          type="date"
+                          value={empDOB}
+                          onChange={(e) => {
+                            setEmpDOB(e.target.value);
+                            if (formErrors.empDOB) {
+                              setFormErrors(prev => ({ ...prev, empDOB: '' }));
+                            }
+                          }}
+                          error={!!formErrors.empDOB}
+                          helperText={formErrors.empDOB}
+                          sx={{
+                            ...selectStyles,
+                            "& input[type='date']::-webkit-calendar-picker-indicator": {
+                              opacity: 0,
+                              cursor: "pointer"
+                            },
+                            "& input[type='date']": {
+                              color: empDOB ? (darkMode ? "#9e9e9e" : "#000") : "transparent",
+                              fontSize: "13px",
+                            },
+                            "& input[type='date']:focus": {
+                              color: darkMode ? "#000" : "#000",
+                            },
+                            "& input[type='date']:before": {
+                              content: empDOB ? '""' : '"Employee DOB"',
+                              color: "#9e9e9e",
+                              position: "absolute",
+                              fontSize: "13px",
+                            }
+                          }}
+                          InputProps={{
+                            placeholder: "Employee DOB"
+                          }}
+                          onFocus={(e) => {
+                            e.target.showPicker();
+                          }}
+                        />
+                      </Grid>
 
+                      <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                        {isEditing ? (
+                          <>
+                            <Button
+                              variant="contained"
+                              onClick={handleUpdate}
+                              disabled={loading}
+                              sx={{
+                                mt: 2,
+                                width: "40%",
+                                backgroundColor: "rgb(18,166,95,0.8)",
+                                color: "#fff",
+                                fontWeight: "bold",
+                                borderRadius: "12px",
+                                "&:hover": {
+                                  backgroundColor: "rgb(18,166,95,0.8)",
+                                  color: "white !important",
+                                },
+                              }}
+                            >
+                              Update
+                            </Button>
+                          </>
+                        ) : (
+                          <Button
+                            variant="contained"
+                            onClick={handleSubmit}
+                            disabled={loading}
+                            sx={{
+                              mt: 1,
+                              width: "40%",
+                              backgroundColor: "rgb(18,166,95,0.8)",
+                              color: "#fff",
+                              fontWeight: "bold",
+                              borderRadius: "12px",
+                              textTransform: 'none',
+                              "&:hover": {
+                                backgroundColor: "rgb(18,166,95,0.8)",
+                                color: "white !important",
+                                textTransform: 'none',
+                              },
+                            }}
+                          >
+                            Submit
+                          </Button>
+                        )}
+                      </Grid>
+                    </Grid>
+                  </>
+                )
+            }
           </Paper>
         </Grid>
       </Grid>
