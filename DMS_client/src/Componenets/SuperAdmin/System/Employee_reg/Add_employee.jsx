@@ -444,17 +444,15 @@ function Add_employee({ darkMode }) {
       }
 
       // Check minimum age (e.g., 18 years)
-      const age = today.getFullYear() - dobDate.getFullYear();
-      const monthDiff = today.getMonth() - dobDate.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
+      let age = today.getFullYear() - dobDate.getFullYear();
+      const m = today.getMonth() - dobDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
         age--;
       }
       if (age < 18) {
         errors.empDOB = 'Employee must be at least 18 years old';
       }
     }
-
-
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -654,7 +652,7 @@ function Add_employee({ darkMode }) {
       if (err.response) {
         console.error("Server Response:", err.response.data);
       }
-      setError(err);
+      // setError(err);
     } finally {
       setLoading1(false);
     }
