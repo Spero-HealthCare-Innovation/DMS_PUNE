@@ -78,9 +78,6 @@ const CaseClosureDetails = ({
       );
 
       console.log("Responder API Response:", response.data);
-
-      // Assuming the API returns responder data in response.data
-      // Adjust this based on your actual API response structure
       if (response.data && Array.isArray(response.data)) {
         setResponderList(response.data);
       } else if (response.data && response.data.responders) {
@@ -245,6 +242,127 @@ const CaseClosureDetails = ({
     );
   };
 
+  // const handleSubmit = async () => {
+  //   if (!validateForm()) {
+  //     setSubmitStatus({
+  //       type: "error",
+  //       message: "Please fill all required fields",
+  //     });
+  //     return;
+  //   }
+
+  //   // Check if we have incident data
+  //   const numericIncId = selectedIncidentFromSop?.inc_id || selectedIncident?.inc_id;
+  //   const incidentId =
+  //     selectedIncidentFromSop?.incident_id || selectedIncident?.incident_id;
+
+
+  //   if (!numericIncId) {
+  //     setSubmitStatus({ type: "error", message: "No incident ID found!" });
+  //     return;
+  //   }
+
+  //   const payload = {
+  //     incident_id: incidentId,
+  //     inc_id: numericIncId,
+  //     // responder: selectedDepartments.length > 0 ? selectedDepartments[0] : "", 
+  //     responder: selectedDepartments,
+  //     closure_responder_name: formData.responderName || "",
+  //     vehicle_no: formData.vehicleNumber,
+  //     closure_acknowledge: formData.acknowledge ? formatDate(formData.acknowledge) : "",
+  //     closure_start_base_location: formData.startBaseLocation ? formatDate(formData.startBaseLocation) : "",
+  //     closure_at_scene: formData.atScene ? formatDate(formData.atScene) : "",
+  //     closure_from_scene: formData.fromScene ? formatDate(formData.fromScene) : "",
+  //     closure_back_to_base: formData.backToBase ? formatDate(formData.backToBase) : "",
+  //     // incident_responder_by: selectedDepartments,
+  //     closure_added_by: userName,
+  //     closure_modified_by: userName,
+  //     closure_modified_date: new Date().toISOString(),
+  //     closure_remark: formData.closureRemark,
+  //   };
+
+  //   console.log("Payload being sent:", payload);
+
+  //   try {
+  //     setLoading(true);
+  //     setSubmitStatus(null);
+
+  //     const authToken = localStorage.getItem("access_token") || token;
+
+  //     const res = await axios.post(
+  //       `${port}/admin_web/closure_post_api/`,
+  //       payload,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${authToken}`,
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
+
+  //     console.log("API Response:", res.data);
+  //     setSubmitStatus({
+  //       type: "success",
+  //       message: "Closure details saved successfully!",
+  //     });
+
+  //     const remainingDepartments = res.data.Departments || [];
+  //     setFormData({
+  //       responderName: "",
+  //       vehicleNumber: "",
+  //       acknowledge: "",
+  //       startBaseLocation: "",
+  //       atScene: "",
+  //       fromScene: "",
+  //       backToBase: "",
+  //       closureRemark: "",
+  //     });
+  //     if (remainingDepartments.length === 0) {
+  //       setFormData({
+  //         vehicleNumber: "",
+  //         responderName: "",
+  //         acknowledge: "",
+  //         startBaseLocation: "",
+  //         atScene: "",
+  //         fromScene: "",
+  //         backToBase: "",
+  //         closureRemark: "",
+  //       });
+  //       setSelectedDepartments([]);
+  //       await fetchResponderList(numericIncId);
+  //       setSelectedIncidentFromSop(null);
+  //       setIsDataCleared(true);
+  //       fetchDispatchList();
+  //       setFormData(prev => ({
+  //         ...prev,
+  //         vehicleNumber: "",
+  //         responderName: "",
+  //         closureRemark: "",
+  //         acknowledge: "",
+  //         startBaseLocation: "",
+  //         atScene: "",
+  //         fromScene: "",
+  //         backToBase: "",
+  //       }));
+  //       setSelectedDepartments([]);
+  //       await fetchResponderList(numericIncId);
+  //     }
+
+  //   } catch (error) {
+  //     console.error("API Error:", error);
+  //     console.error("Error response:", error.response?.data);
+
+  //     const errorMessage =
+  //       error.response?.data?.message ||
+  //       error.response?.data?.error ||
+  //       "Failed to save closure details.";
+
+  //     setSubmitStatus({ type: "error", message: errorMessage });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async () => {
     if (!validateForm()) {
       setSubmitStatus({
@@ -254,11 +372,8 @@ const CaseClosureDetails = ({
       return;
     }
 
-    // Check if we have incident data
     const numericIncId = selectedIncidentFromSop?.inc_id || selectedIncident?.inc_id;
-    const incidentId =
-      selectedIncidentFromSop?.incident_id || selectedIncident?.incident_id;
-
+    const incidentId = selectedIncidentFromSop?.incident_id || selectedIncident?.incident_id;
 
     if (!numericIncId) {
       setSubmitStatus({ type: "error", message: "No incident ID found!" });
@@ -268,7 +383,6 @@ const CaseClosureDetails = ({
     const payload = {
       incident_id: incidentId,
       inc_id: numericIncId,
-      // responder: selectedDepartments.length > 0 ? selectedDepartments[0] : "", 
       responder: selectedDepartments,
       closure_responder_name: formData.responderName || "",
       vehicle_no: formData.vehicleNumber,
@@ -277,7 +391,6 @@ const CaseClosureDetails = ({
       closure_at_scene: formData.atScene ? formatDate(formData.atScene) : "",
       closure_from_scene: formData.fromScene ? formatDate(formData.fromScene) : "",
       closure_back_to_base: formData.backToBase ? formatDate(formData.backToBase) : "",
-      // incident_responder_by: selectedDepartments,
       closure_added_by: userName,
       closure_modified_by: userName,
       closure_modified_date: new Date().toISOString(),
@@ -310,6 +423,8 @@ const CaseClosureDetails = ({
       });
 
       const remainingDepartments = res.data.Departments || [];
+
+      // Clear form and selected departments
       setFormData({
         responderName: "",
         vehicleNumber: "",
@@ -320,36 +435,12 @@ const CaseClosureDetails = ({
         backToBase: "",
         closureRemark: "",
       });
-      if (remainingDepartments.length === 0) {
-        setFormData({
-          vehicleNumber: "",
-          responderName: "",
-          acknowledge: "",
-          startBaseLocation: "",
-          atScene: "",
-          fromScene: "",
-          backToBase: "",
-          closureRemark: "",
-        });
-        setSelectedDepartments([]);
-        setSelectedIncidentFromSop(null);
-        setIsDataCleared(true);
-        fetchDispatchList();
-        await fetchResponderList(numericIncId);
-        setFormData(prev => ({
-          ...prev,
-          vehicleNumber: "",
-          responderName: "",
-          closureRemark: "",
-          acknowledge: "",
-          startBaseLocation: "",
-          atScene: "",
-          fromScene: "",
-          backToBase: "",
-        }));
-        setSelectedDepartments([]);
-        await fetchResponderList(numericIncId);
-      }
+      setSelectedDepartments([]);
+
+      await fetchResponderList(numericIncId);
+      setSelectedIncidentFromSop(null);
+      setIsDataCleared(true);
+      fetchDispatchList();
 
     } catch (error) {
       console.error("API Error:", error);
